@@ -18,8 +18,8 @@ All colors MUST be HSL.
     --popover: 255 255 255;
     --popover-foreground: 15 23 42;
 
-    --primary: 99 102 241;
-    --primary-foreground: 248 250 252;
+    --primary: 79 70 229;
+    --primary-foreground: 255 255 255;
 
     --secondary: 241 245 249;
     --secondary-foreground: 15 23 42;
@@ -35,18 +35,18 @@ All colors MUST be HSL.
 
     --border: 226 232 240;
     --input: 226 232 240;
-    --ring: 99 102 241;
+    --ring: 79 70 229;
 
     --radius: 0.75rem;
 
     --sidebar-background: 255 255 255;
     --sidebar-foreground: 15 23 42;
-    --sidebar-primary: 99 102 241;
-    --sidebar-primary-foreground: 248 250 252;
+    --sidebar-primary: 79 70 229;
+    --sidebar-primary-foreground: 255 255 255;
     --sidebar-accent: 241 245 249;
     --sidebar-accent-foreground: 15 23 42;
     --sidebar-border: 226 232 240;
-    --sidebar-ring: 99 102 241;
+    --sidebar-ring: 79 70 229;
   }
 
   .dark {
@@ -95,20 +95,24 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-gradient-to-br from-slate-50 to-blue-50 text-foreground min-h-screen;
+    @apply bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 text-foreground min-h-screen;
   }
 }
 
 @layer components {
   .glass-card {
-    @apply bg-white/80 backdrop-blur-sm border border-white/20 shadow-xl;
+    @apply bg-white/90 backdrop-blur-sm border border-white/30 shadow-xl;
   }
   
   .material-card {
-    @apply bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-200/50;
+    @apply bg-white/95 backdrop-blur-sm rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-200/60;
   }
   
   .gradient-text {
-    @apply bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600 bg-clip-text text-transparent;
+  }
+  
+  .subscription-card {
+    @apply bg-gradient-to-br from-orange-50 to-red-50 border border-orange-200/50;
   }
 }

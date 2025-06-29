@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Upload, TrendingUp, TrendingDown, Target, DollarSign } from "lucide-react";
+import { Plus, Upload, TrendingUp, TrendingDown, Target, DollarSign, RefreshCw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import BudgetOverview from "@/components/BudgetOverview";
 import TransactionForm from "@/components/TransactionForm";
@@ -12,6 +12,7 @@ import ExpenseChart from "@/components/ExpenseChart";
 import IncomeChart from "@/components/IncomeChart";
 import SavingsGoals from "@/components/SavingsGoals";
 import FileImport from "@/components/FileImport";
+import SubscriptionTracker, { Subscription } from "@/components/SubscriptionTracker";
 
 export interface Transaction {
   id: string;
@@ -33,6 +34,7 @@ export interface SavingsGoal {
 const Index = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [savingsGoals, setSavingsGoals] = useState<SavingsGoal[]>([]);
+  const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [showTransactionForm, setShowTransactionForm] = useState(false);
   const { toast } = useToast();
 
@@ -40,12 +42,16 @@ const Index = () => {
   useEffect(() => {
     const savedTransactions = localStorage.getItem('budget-transactions');
     const savedGoals = localStorage.getItem('savings-goals');
+    const savedSubscriptions = localStorage.getItem('subscriptions');
     
     if (savedTransactions) {
       setTransactions(JSON.parse(savedTransactions));
     }
     if (savedGoals) {
       setSavingsGoals(JSON.parse(savedGoals));
+    }
+    if (savedSubscriptions) {
+      setSubscriptions(JSON.parse(savedSubscriptions));
     }
   }, []);
 
@@ -57,6 +63,10 @@ const Index = () => {
   useEffect(() => {
     localStorage.setItem('savings-goals', JSON.stringify(savingsGoals));
   }, [savingsGoals]);
+
+  useEffect(() => {
+    localStorage.setItem('subscriptions', JSON.stringify(subscriptions));
+  }, [subscriptions]);
 
   const handleAddTransaction = (transaction: Omit<Transaction, 'id'>) => {
     const newTransaction = {
@@ -100,13 +110,25 @@ const Index = () => {
       .filter(t => t.type === 'savings')
       .reduce((sum, t) => sum + t.amount, 0);
 
-    return { income, expenses, savings, balance: income - expenses };
+    const monthlySubscriptions = subscriptions
+      .filter(sub => sub.isActive)
+      .reduce((total, sub) => {
+        const multiplier = {
+          weekly: 4.33,
+          monthly: 1,
+          quarterly: 0.33,
+          yearly: 0.083
+        }[sub.frequency];
+        return total + (sub.amount * multiplier);
+      }, 0);
+
+    return { income, expenses, savings, balance: income - expenses, monthlySubscriptions };
   };
 
   const totals = calculateTotals();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-4">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="text-center space-y-4 py-8">
@@ -115,7 +137,7 @@ const Index = () => {
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
           <Card className="material-card hover:scale-105 transition-transform">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
@@ -162,6 +184,20 @@ const Index = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
+                  <p className="text-sm font-medium text-slate-600">Subscriptions</p>
+                  <p className="text-2xl font-bold text-orange-600">${totals.monthlySubscriptions.toFixed(0)}/mo</p>
+                </div>
+                <div className="p-3 bg-orange-100 rounded-full">
+                  <RefreshCw className="h-6 w-6 text-orange-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="material-card hover:scale-105 transition-transform">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
                   <p className="text-sm font-medium text-slate-600">Net Balance</p>
                   <p className={`text-2xl font-bold ${totals.balance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                     ${totals.balance.toLocaleString()}
@@ -190,9 +226,10 @@ const Index = () => {
 
         {/* Main Content Tabs */}
         <Tabs defaultValue="dashboard" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-1 md:grid-cols-5 lg:w-fit mx-auto bg-white/80 backdrop-blur-sm">
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-6 lg:w-fit mx-auto bg-white/90 backdrop-blur-sm">
             <TabsTrigger value="dashboard" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white">Dashboard</TabsTrigger>
             <TabsTrigger value="transactions" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white">Transactions</TabsTrigger>
+            <TabsTrigger value="subscriptions" className="data-[state=active]:bg-orange-600 data-[state=active]:text-white">Subscriptions</TabsTrigger>
             <TabsTrigger value="expenses" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white">Expenses</TabsTrigger>
             <TabsTrigger value="income" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white">Income</TabsTrigger>
             <TabsTrigger value="savings" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white">Savings</TabsTrigger>
@@ -206,6 +243,13 @@ const Index = () => {
             <TransactionList 
               transactions={transactions} 
               onDelete={handleDeleteTransaction}
+            />
+          </TabsContent>
+
+          <TabsContent value="subscriptions" className="space-y-6">
+            <SubscriptionTracker 
+              subscriptions={subscriptions}
+              onUpdateSubscriptions={setSubscriptions}
             />
           </TabsContent>
 
