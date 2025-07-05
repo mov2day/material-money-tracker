@@ -231,50 +231,50 @@ const Index = () => {
 
         {/* Enhanced Main Content Tabs */}
         <Tabs defaultValue="dashboard" className="space-y-8">
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-6 lg:w-fit mx-auto bg-white/90 backdrop-blur-sm border border-slate-200/50 shadow-lg rounded-2xl p-2">
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-6 lg:w-fit mx-auto bg-white backdrop-blur-sm border border-slate-200 shadow-lg rounded-2xl p-2">
             <TabsTrigger 
               value="dashboard" 
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-600 data-[state=active]:to-purple-600 data-[state=active]:text-white rounded-xl transition-all duration-300 font-medium flex items-center gap-2"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-600 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=inactive]:text-slate-700 data-[state=inactive]:hover:text-slate-900 data-[state=inactive]:hover:bg-slate-100 rounded-xl transition-all duration-300 font-medium flex items-center gap-2"
             >
               <BarChart3 className="h-4 w-4" />
               Dashboard
             </TabsTrigger>
             <TabsTrigger 
               value="transactions" 
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-600 data-[state=active]:to-purple-600 data-[state=active]:text-white rounded-xl transition-all duration-300 font-medium"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-600 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=inactive]:text-slate-700 data-[state=inactive]:hover:text-slate-900 data-[state=inactive]:hover:bg-slate-100 rounded-xl transition-all duration-300 font-medium"
             >
               Transactions
             </TabsTrigger>
             <TabsTrigger 
               value="subscriptions" 
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-600 data-[state=active]:to-red-600 data-[state=active]:text-white rounded-xl transition-all duration-300 font-medium"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-600 data-[state=active]:to-red-600 data-[state=active]:text-white data-[state=inactive]:text-slate-700 data-[state=inactive]:hover:text-slate-900 data-[state=inactive]:hover:bg-slate-100 rounded-xl transition-all duration-300 font-medium"
             >
               Subscriptions
             </TabsTrigger>
             <TabsTrigger 
               value="expenses" 
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-600 data-[state=active]:to-purple-600 data-[state=active]:text-white rounded-xl transition-all duration-300 font-medium flex items-center gap-2"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-600 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=inactive]:text-slate-700 data-[state=inactive]:hover:text-slate-900 data-[state=inactive]:hover:bg-slate-100 rounded-xl transition-all duration-300 font-medium flex items-center gap-2"
             >
               <PieChart className="h-4 w-4" />
               Expenses
             </TabsTrigger>
             <TabsTrigger 
               value="income" 
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-600 data-[state=active]:to-purple-600 data-[state=active]:text-white rounded-xl transition-all duration-300 font-medium flex items-center gap-2"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-600 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=inactive]:text-slate-700 data-[state=inactive]:hover:text-slate-900 data-[state=inactive]:hover:bg-slate-100 rounded-xl transition-all duration-300 font-medium flex items-center gap-2"
             >
               <LineChart className="h-4 w-4" />
               Income
             </TabsTrigger>
             <TabsTrigger 
               value="savings" 
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-600 data-[state=active]:to-purple-600 data-[state=active]:text-white rounded-xl transition-all duration-300 font-medium"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-600 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=inactive]:text-slate-700 data-[state=inactive]:hover:text-slate-900 data-[state=inactive]:hover:bg-slate-100 rounded-xl transition-all duration-300 font-medium"
             >
               Savings
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="dashboard" className="space-y-8">
-            <BudgetOverview transactions={transactions} />
+            <BudgetOverview transactions={transactions} subscriptions={subscriptions} />
           </TabsContent>
 
           <TabsContent value="transactions" className="space-y-8">
