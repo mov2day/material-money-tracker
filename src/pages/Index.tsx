@@ -375,17 +375,17 @@ const Index = () => {
               Transactions
             </TabsTrigger>
             <TabsTrigger 
-              value="subscriptions" 
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-600 data-[state=active]:to-red-600 data-[state=active]:text-white data-[state=inactive]:text-slate-700 data-[state=inactive]:hover:text-slate-900 data-[state=inactive]:hover:bg-slate-100 rounded-xl transition-all duration-300 font-medium"
-            >
-              Subscriptions
-            </TabsTrigger>
-            <TabsTrigger 
               value="expenses" 
               className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-600 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=inactive]:text-slate-700 data-[state=inactive]:hover:text-slate-900 data-[state=inactive]:hover:bg-slate-100 rounded-xl transition-all duration-300 font-medium flex items-center gap-2"
             >
               <PieChart className="h-4 w-4" />
               Expenses
+            </TabsTrigger>
+            <TabsTrigger 
+              value="subscriptions" 
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-600 data-[state=active]:to-red-600 data-[state=active]:text-white data-[state=inactive]:text-slate-700 data-[state=inactive]:hover:text-slate-900 data-[state=inactive]:hover:bg-slate-100 rounded-xl transition-all duration-300 font-medium"
+            >
+              Subscriptions
             </TabsTrigger>
             <TabsTrigger 
               value="income" 
@@ -420,15 +420,15 @@ const Index = () => {
             />
           </TabsContent>
 
+          <TabsContent value="expenses" className="space-y-8">
+            <ExpenseChart transactions={transactions} />
+          </TabsContent>
+
           <TabsContent value="subscriptions" className="space-y-8">
             <SubscriptionTracker 
               subscriptions={subscriptions}
               onUpdateSubscriptions={setSubscriptions}
             />
-          </TabsContent>
-
-          <TabsContent value="expenses" className="space-y-8">
-            <ExpenseChart transactions={transactions} />
           </TabsContent>
 
           <TabsContent value="income" className="space-y-8">
