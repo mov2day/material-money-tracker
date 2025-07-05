@@ -3,9 +3,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Enhanced design system with improved colors and components */
 
 @layer base {
   :root {
@@ -95,17 +93,17 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 text-foreground min-h-screen;
+    @apply bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 text-foreground min-h-screen font-sans;
   }
 }
 
 @layer components {
   .glass-card {
-    @apply bg-white/90 backdrop-blur-sm border border-white/30 shadow-xl;
+    @apply bg-white/95 backdrop-blur-md border border-white/40 shadow-2xl rounded-2xl;
   }
   
   .material-card {
-    @apply bg-white/95 backdrop-blur-sm rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-200/60;
+    @apply bg-white/98 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-slate-200/60 hover:border-slate-300/80;
   }
   
   .gradient-text {
@@ -113,6 +111,72 @@ All colors MUST be HSL.
   }
   
   .subscription-card {
-    @apply bg-gradient-to-br from-orange-50 to-red-50 border border-orange-200/50;
+    @apply bg-gradient-to-br from-orange-50 to-red-50 border border-orange-200/50 rounded-2xl;
   }
+
+  .chart-container {
+    @apply bg-white/95 backdrop-blur-sm rounded-3xl shadow-xl border border-slate-200/50 p-8 hover:shadow-2xl transition-all duration-300;
+  }
+
+  .stat-card {
+    @apply bg-gradient-to-br backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-opacity-50 hover:scale-105 transform;
+  }
+
+  .enhanced-button {
+    @apply bg-gradient-to-r shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl font-semibold;
+  }
+
+  .tab-trigger-enhanced {
+    @apply transition-all duration-300 font-medium rounded-xl px-6 py-3 hover:bg-slate-100/80;
+  }
+
+  .menu-bar-enhanced {
+    @apply bg-white/95 backdrop-blur-md border border-slate-200/60 shadow-xl rounded-2xl;
+  }
+}
+
+/* Enhanced animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(79, 70, 229, 0.3); }
+  50% { box-shadow: 0 0 40px rgba(79, 70, 229, 0.6); }
+}
+
+.float-animation {
+  animation: float 3s ease-in-out infinite;
+}
+
+.glow-animation {
+  animation: glow 2s ease-in-out infinite;
+}
+
+/* Enhanced chart styles */
+.recharts-cartesian-grid-horizontal line,
+.recharts-cartesian-grid-vertical line {
+  @apply stroke-slate-200/60;
+}
+
+.recharts-text {
+  @apply fill-slate-600 text-sm font-medium;
+}
+
+.recharts-legend-wrapper {
+  @apply font-semibold;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-slate-100 rounded-full;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-300 rounded-full hover:bg-slate-400;
 }

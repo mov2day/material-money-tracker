@@ -1,9 +1,8 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Upload, TrendingUp, TrendingDown, Target, DollarSign, RefreshCw } from "lucide-react";
+import { Plus, Upload, TrendingUp, TrendingDown, Target, DollarSign, RefreshCw, BarChart3, PieChart, LineChart } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import BudgetOverview from "@/components/BudgetOverview";
 import TransactionForm from "@/components/TransactionForm";
@@ -128,140 +127,179 @@ const Index = () => {
   const totals = calculateTotals();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-4">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="text-center space-y-4 py-8">
-          <h1 className="text-4xl font-bold gradient-text">Personal Budget Tracker</h1>
-          <p className="text-lg text-slate-600">Take control of your finances with intelligent insights</p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-4">
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* Enhanced Header */}
+        <div className="text-center space-y-6 py-12">
+          <div className="space-y-2">
+            <h1 className="text-5xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
+              Personal Budget Tracker
+            </h1>
+            <p className="text-xl text-slate-600 max-w-2xl mx-auto">
+              Take control of your finances with intelligent insights and beautiful analytics
+            </p>
+          </div>
+          
+          {/* Action Buttons */}
+          <div className="flex flex-wrap gap-4 justify-center pt-4">
+            <Button 
+              onClick={() => setShowTransactionForm(true)}
+              className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 px-8 py-3 text-lg rounded-xl"
+              size="lg"
+            >
+              <Plus className="mr-2 h-5 w-5" />
+              Add Transaction
+            </Button>
+            <FileImport onImport={handleFileImport} />
+          </div>
         </div>
 
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-          <Card className="material-card hover:scale-105 transition-transform">
+        {/* Enhanced Quick Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+          <Card className="bg-gradient-to-br from-green-50 to-emerald-100 border-green-200/50 hover:shadow-lg transition-all duration-300 hover:scale-105">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-slate-600">Total Income</p>
-                  <p className="text-2xl font-bold text-green-600">${totals.income.toLocaleString()}</p>
+                  <p className="text-sm font-medium text-green-700">Total Income</p>
+                  <p className="text-3xl font-bold text-green-600">${totals.income.toLocaleString()}</p>
                 </div>
-                <div className="p-3 bg-green-100 rounded-full">
-                  <TrendingUp className="h-6 w-6 text-green-600" />
+                <div className="p-4 bg-green-500 rounded-2xl shadow-lg">
+                  <TrendingUp className="h-7 w-7 text-white" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="material-card hover:scale-105 transition-transform">
+          <Card className="bg-gradient-to-br from-red-50 to-rose-100 border-red-200/50 hover:shadow-lg transition-all duration-300 hover:scale-105">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-slate-600">Total Expenses</p>
-                  <p className="text-2xl font-bold text-red-600">${totals.expenses.toLocaleString()}</p>
+                  <p className="text-sm font-medium text-red-700">Total Expenses</p>
+                  <p className="text-3xl font-bold text-red-600">${totals.expenses.toLocaleString()}</p>
                 </div>
-                <div className="p-3 bg-red-100 rounded-full">
-                  <TrendingDown className="h-6 w-6 text-red-600" />
+                <div className="p-4 bg-red-500 rounded-2xl shadow-lg">
+                  <TrendingDown className="h-7 w-7 text-white" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="material-card hover:scale-105 transition-transform">
+          <Card className="bg-gradient-to-br from-blue-50 to-sky-100 border-blue-200/50 hover:shadow-lg transition-all duration-300 hover:scale-105">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-slate-600">Total Savings</p>
-                  <p className="text-2xl font-bold text-blue-600">${totals.savings.toLocaleString()}</p>
+                  <p className="text-sm font-medium text-blue-700">Total Savings</p>
+                  <p className="text-3xl font-bold text-blue-600">${totals.savings.toLocaleString()}</p>
                 </div>
-                <div className="p-3 bg-blue-100 rounded-full">
-                  <Target className="h-6 w-6 text-blue-600" />
+                <div className="p-4 bg-blue-500 rounded-2xl shadow-lg">
+                  <Target className="h-7 w-7 text-white" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="material-card hover:scale-105 transition-transform">
+          <Card className="bg-gradient-to-br from-orange-50 to-amber-100 border-orange-200/50 hover:shadow-lg transition-all duration-300 hover:scale-105">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-slate-600">Subscriptions</p>
-                  <p className="text-2xl font-bold text-orange-600">${totals.monthlySubscriptions.toFixed(0)}/mo</p>
+                  <p className="text-sm font-medium text-orange-700">Subscriptions</p>
+                  <p className="text-3xl font-bold text-orange-600">${totals.monthlySubscriptions.toFixed(0)}/mo</p>
                 </div>
-                <div className="p-3 bg-orange-100 rounded-full">
-                  <RefreshCw className="h-6 w-6 text-orange-600" />
+                <div className="p-4 bg-orange-500 rounded-2xl shadow-lg">
+                  <RefreshCw className="h-7 w-7 text-white" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="material-card hover:scale-105 transition-transform">
+          <Card className={`${totals.balance >= 0 ? 'bg-gradient-to-br from-emerald-50 to-green-100 border-emerald-200/50' : 'bg-gradient-to-br from-red-50 to-rose-100 border-red-200/50'} hover:shadow-lg transition-all duration-300 hover:scale-105`}>
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-slate-600">Net Balance</p>
-                  <p className={`text-2xl font-bold ${totals.balance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  <p className={`text-sm font-medium ${totals.balance >= 0 ? 'text-emerald-700' : 'text-red-700'}`}>Net Balance</p>
+                  <p className={`text-3xl font-bold ${totals.balance >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
                     ${totals.balance.toLocaleString()}
                   </p>
                 </div>
-                <div className={`p-3 rounded-full ${totals.balance >= 0 ? 'bg-green-100' : 'bg-red-100'}`}>
-                  <DollarSign className={`h-6 w-6 ${totals.balance >= 0 ? 'text-green-600' : 'text-red-600'}`} />
+                <div className={`p-4 rounded-2xl shadow-lg ${totals.balance >= 0 ? 'bg-emerald-500' : 'bg-red-500'}`}>
+                  <DollarSign className="h-7 w-7 text-white" />
                 </div>
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex flex-wrap gap-4 justify-center">
-          <Button 
-            onClick={() => setShowTransactionForm(true)}
-            className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all"
-            size="lg"
-          >
-            <Plus className="mr-2 h-5 w-5" />
-            Add Transaction
-          </Button>
-          <FileImport onImport={handleFileImport} />
-        </div>
-
-        {/* Main Content Tabs */}
-        <Tabs defaultValue="dashboard" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-6 lg:w-fit mx-auto bg-white/90 backdrop-blur-sm">
-            <TabsTrigger value="dashboard" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white">Dashboard</TabsTrigger>
-            <TabsTrigger value="transactions" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white">Transactions</TabsTrigger>
-            <TabsTrigger value="subscriptions" className="data-[state=active]:bg-orange-600 data-[state=active]:text-white">Subscriptions</TabsTrigger>
-            <TabsTrigger value="expenses" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white">Expenses</TabsTrigger>
-            <TabsTrigger value="income" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white">Income</TabsTrigger>
-            <TabsTrigger value="savings" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white">Savings</TabsTrigger>
+        {/* Enhanced Main Content Tabs */}
+        <Tabs defaultValue="dashboard" className="space-y-8">
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-6 lg:w-fit mx-auto bg-white/90 backdrop-blur-sm border border-slate-200/50 shadow-lg rounded-2xl p-2">
+            <TabsTrigger 
+              value="dashboard" 
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-600 data-[state=active]:to-purple-600 data-[state=active]:text-white rounded-xl transition-all duration-300 font-medium flex items-center gap-2"
+            >
+              <BarChart3 className="h-4 w-4" />
+              Dashboard
+            </TabsTrigger>
+            <TabsTrigger 
+              value="transactions" 
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-600 data-[state=active]:to-purple-600 data-[state=active]:text-white rounded-xl transition-all duration-300 font-medium"
+            >
+              Transactions
+            </TabsTrigger>
+            <TabsTrigger 
+              value="subscriptions" 
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-600 data-[state=active]:to-red-600 data-[state=active]:text-white rounded-xl transition-all duration-300 font-medium"
+            >
+              Subscriptions
+            </TabsTrigger>
+            <TabsTrigger 
+              value="expenses" 
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-600 data-[state=active]:to-purple-600 data-[state=active]:text-white rounded-xl transition-all duration-300 font-medium flex items-center gap-2"
+            >
+              <PieChart className="h-4 w-4" />
+              Expenses
+            </TabsTrigger>
+            <TabsTrigger 
+              value="income" 
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-600 data-[state=active]:to-purple-600 data-[state=active]:text-white rounded-xl transition-all duration-300 font-medium flex items-center gap-2"
+            >
+              <LineChart className="h-4 w-4" />
+              Income
+            </TabsTrigger>
+            <TabsTrigger 
+              value="savings" 
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-600 data-[state=active]:to-purple-600 data-[state=active]:text-white rounded-xl transition-all duration-300 font-medium"
+            >
+              Savings
+            </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="dashboard" className="space-y-6">
+          <TabsContent value="dashboard" className="space-y-8">
             <BudgetOverview transactions={transactions} />
           </TabsContent>
 
-          <TabsContent value="transactions" className="space-y-6">
+          <TabsContent value="transactions" className="space-y-8">
             <TransactionList 
               transactions={transactions} 
               onDelete={handleDeleteTransaction}
             />
           </TabsContent>
 
-          <TabsContent value="subscriptions" className="space-y-6">
+          <TabsContent value="subscriptions" className="space-y-8">
             <SubscriptionTracker 
               subscriptions={subscriptions}
               onUpdateSubscriptions={setSubscriptions}
             />
           </TabsContent>
 
-          <TabsContent value="expenses" className="space-y-6">
+          <TabsContent value="expenses" className="space-y-8">
             <ExpenseChart transactions={transactions} />
           </TabsContent>
 
-          <TabsContent value="income" className="space-y-6">
+          <TabsContent value="income" className="space-y-8">
             <IncomeChart transactions={transactions} />
           </TabsContent>
 
-          <TabsContent value="savings" className="space-y-6">
+          <TabsContent value="savings" className="space-y-8">
             <SavingsGoals 
               goals={savingsGoals} 
               onUpdateGoals={setSavingsGoals}
