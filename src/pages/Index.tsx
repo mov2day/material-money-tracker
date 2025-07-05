@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -77,51 +78,68 @@ const Index = () => {
     localStorage.setItem('scheduled-incomes', JSON.stringify(scheduledIncomes));
   }, [scheduledIncomes]);
 
-  // Add scheduled income transactions at the beginning of each month
+  // Process scheduled incomes when they change or on component mount
   useEffect(() => {
-    const addScheduledIncomeTransactions = () => {
+    const processScheduledIncomes = () => {
       const now = new Date();
       const currentMonth = now.getMonth();
       const currentYear = now.getFullYear();
       const today = now.getDate();
 
+      console.log('Processing scheduled incomes:', { scheduledIncomes, today, currentMonth, currentYear });
+
+      let newTransactions: Transaction[] = [];
+
       scheduledIncomes
-        .filter(income => income.isActive && income.dayOfMonth === today)
+        .filter(income => income.isActive)
         .forEach(income => {
-          // Check if this scheduled income was already added this month
-          const existingTransaction = transactions.find(t => 
-            t.description.includes(`[Scheduled] ${income.description}`) &&
-            new Date(t.date).getMonth() === currentMonth &&
-            new Date(t.date).getFullYear() === currentYear
-          );
+          console.log('Checking income:', income.description, 'Day:', income.dayOfMonth, 'Today:', today);
+          
+          // Check if this scheduled income should be added this month
+          if (income.dayOfMonth <= today) {
+            // Check if this scheduled income was already added this month
+            const existingTransaction = transactions.find(t => 
+              t.description.includes(`[Auto] ${income.description}`) &&
+              new Date(t.date).getMonth() === currentMonth &&
+              new Date(t.date).getFullYear() === currentYear
+            );
 
-          if (!existingTransaction) {
-            const scheduledTransaction: Transaction = {
-              id: `scheduled-${income.id}-${currentMonth}-${currentYear}`,
-              type: 'income',
-              category: income.category,
-              amount: income.amount,
-              description: `[Scheduled] ${income.description}`,
-              date: now.toISOString().split('T')[0]
-            };
+            console.log('Existing transaction found:', !!existingTransaction);
 
-            setTransactions(prev => [scheduledTransaction, ...prev]);
-            toast({
-              title: "Scheduled Income Added",
-              description: `${income.description}: $${income.amount} has been automatically added.`,
-            });
+            if (!existingTransaction) {
+              const scheduledTransaction: Transaction = {
+                id: `scheduled-${income.id}-${currentMonth}-${currentYear}`,
+                type: 'income',
+                category: income.category,
+                amount: income.amount,
+                description: `[Auto] ${income.description}`,
+                date: `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(income.dayOfMonth).padStart(2, '0')}`
+              };
+
+              newTransactions.push(scheduledTransaction);
+              console.log('Created scheduled transaction:', scheduledTransaction);
+            }
           }
         });
+
+      if (newTransactions.length > 0) {
+        console.log('Adding new scheduled transactions:', newTransactions);
+        setTransactions(prev => [...newTransactions, ...prev]);
+        
+        newTransactions.forEach(transaction => {
+          toast({
+            title: "Scheduled Income Added",
+            description: `${transaction.description.replace('[Auto] ', '')}: $${transaction.amount} has been automatically added.`,
+          });
+        });
+      }
     };
 
-    // Check for scheduled income on component mount and daily
-    addScheduledIncomeTransactions();
-    
-    // Set up interval to check daily (optional: could be triggered by user action)
-    const interval = setInterval(addScheduledIncomeTransactions, 24 * 60 * 60 * 1000);
-    
-    return () => clearInterval(interval);
-  }, [scheduledIncomes, transactions, toast]);
+    // Only process if we have scheduled incomes and transactions are loaded
+    if (scheduledIncomes.length > 0) {
+      processScheduledIncomes();
+    }
+  }, [scheduledIncomes, toast]); // Removed transactions from dependency to avoid infinite loop
 
   const handleAddTransaction = (transaction: Omit<Transaction, 'id'>) => {
     const newTransaction = {
@@ -150,6 +168,53 @@ const Index = () => {
       title: "Import Successful",
       description: `${importedTransactions.length} transactions imported successfully.`,
     });
+  };
+
+  // Manual trigger for scheduled income processing
+  const processScheduledIncomesNow = () => {
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    let newTransactions: Transaction[] = [];
+
+    scheduledIncomes
+      .filter(income => income.isActive)
+      .forEach(income => {
+        // Check if this scheduled income was already added this month
+        const existingTransaction = transactions.find(t => 
+          t.description.includes(`[Auto] ${income.description}`) &&
+          new Date(t.date).getMonth() === currentMonth &&
+          new Date(t.date).getFullYear() === currentYear
+        );
+
+        if (!existingTransaction) {
+          const scheduledTransaction: Transaction = {
+            id: `scheduled-${income.id}-${currentMonth}-${currentYear}-${Date.now()}`,
+            type: 'income',
+            category: income.category,
+            amount: income.amount,
+            description: `[Auto] ${income.description}`,
+            date: now.toISOString().split('T')[0]
+          };
+
+          newTransactions.push(scheduledTransaction);
+        }
+      });
+
+    if (newTransactions.length > 0) {
+      setTransactions(prev => [...newTransactions, ...prev]);
+      
+      toast({
+        title: "Scheduled Incomes Processed",
+        description: `${newTransactions.length} scheduled income(s) added to transactions.`,
+      });
+    } else {
+      toast({
+        title: "No New Scheduled Incomes",
+        description: "All scheduled incomes for this month have already been added.",
+      });
+    }
   };
 
   const calculateTotals = () => {
@@ -205,6 +270,14 @@ const Index = () => {
             >
               <Plus className="mr-2 h-5 w-5" />
               Add Transaction
+            </Button>
+            <Button 
+              onClick={processScheduledIncomesNow}
+              className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 px-8 py-3 text-lg rounded-xl"
+              size="lg"
+            >
+              <RefreshCw className="mr-2 h-5 w-5" />
+              Process Scheduled Income
             </Button>
             <FileImport onImport={handleFileImport} />
           </div>
