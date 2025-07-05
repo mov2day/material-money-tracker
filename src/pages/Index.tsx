@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Upload, TrendingUp, TrendingDown, Target, DollarSign, RefreshCw, BarChart3, PieChart, LineChart } from "lucide-react";
+import { Plus, Upload, TrendingUp, TrendingDown, Target, DollarSign, RefreshCw, BarChart3, PieChart, LineChart, Calendar } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import BudgetOverview from "@/components/BudgetOverview";
 import TransactionForm from "@/components/TransactionForm";
@@ -12,6 +12,7 @@ import IncomeChart from "@/components/IncomeChart";
 import SavingsGoals from "@/components/SavingsGoals";
 import FileImport from "@/components/FileImport";
 import SubscriptionTracker, { Subscription } from "@/components/SubscriptionTracker";
+import ScheduledIncome, { ScheduledIncomeItem } from "@/components/ScheduledIncome";
 
 export interface Transaction {
   id: string;
@@ -34,6 +35,7 @@ const Index = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [savingsGoals, setSavingsGoals] = useState<SavingsGoal[]>([]);
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
+  const [scheduledIncomes, setScheduledIncomes] = useState<ScheduledIncomeItem[]>([]);
   const [showTransactionForm, setShowTransactionForm] = useState(false);
   const { toast } = useToast();
 
@@ -42,6 +44,7 @@ const Index = () => {
     const savedTransactions = localStorage.getItem('budget-transactions');
     const savedGoals = localStorage.getItem('savings-goals');
     const savedSubscriptions = localStorage.getItem('subscriptions');
+    const savedScheduledIncomes = localStorage.getItem('scheduled-incomes');
     
     if (savedTransactions) {
       setTransactions(JSON.parse(savedTransactions));
@@ -51,6 +54,9 @@ const Index = () => {
     }
     if (savedSubscriptions) {
       setSubscriptions(JSON.parse(savedSubscriptions));
+    }
+    if (savedScheduledIncomes) {
+      setScheduledIncomes(JSON.parse(savedScheduledIncomes));
     }
   }, []);
 
@@ -66,6 +72,56 @@ const Index = () => {
   useEffect(() => {
     localStorage.setItem('subscriptions', JSON.stringify(subscriptions));
   }, [subscriptions]);
+
+  useEffect(() => {
+    localStorage.setItem('scheduled-incomes', JSON.stringify(scheduledIncomes));
+  }, [scheduledIncomes]);
+
+  // Add scheduled income transactions at the beginning of each month
+  useEffect(() => {
+    const addScheduledIncomeTransactions = () => {
+      const now = new Date();
+      const currentMonth = now.getMonth();
+      const currentYear = now.getFullYear();
+      const today = now.getDate();
+
+      scheduledIncomes
+        .filter(income => income.isActive && income.dayOfMonth === today)
+        .forEach(income => {
+          // Check if this scheduled income was already added this month
+          const existingTransaction = transactions.find(t => 
+            t.description.includes(`[Scheduled] ${income.description}`) &&
+            new Date(t.date).getMonth() === currentMonth &&
+            new Date(t.date).getFullYear() === currentYear
+          );
+
+          if (!existingTransaction) {
+            const scheduledTransaction: Transaction = {
+              id: `scheduled-${income.id}-${currentMonth}-${currentYear}`,
+              type: 'income',
+              category: income.category,
+              amount: income.amount,
+              description: `[Scheduled] ${income.description}`,
+              date: now.toISOString().split('T')[0]
+            };
+
+            setTransactions(prev => [scheduledTransaction, ...prev]);
+            toast({
+              title: "Scheduled Income Added",
+              description: `${income.description}: $${income.amount} has been automatically added.`,
+            });
+          }
+        });
+    };
+
+    // Check for scheduled income on component mount and daily
+    addScheduledIncomeTransactions();
+    
+    // Set up interval to check daily (optional: could be triggered by user action)
+    const interval = setInterval(addScheduledIncomeTransactions, 24 * 60 * 60 * 1000);
+    
+    return () => clearInterval(interval);
+  }, [scheduledIncomes, transactions, toast]);
 
   const handleAddTransaction = (transaction: Omit<Transaction, 'id'>) => {
     const newTransaction = {
@@ -231,7 +287,7 @@ const Index = () => {
 
         {/* Enhanced Main Content Tabs */}
         <Tabs defaultValue="dashboard" className="space-y-8">
-          <TabsList className="grid w-full grid-cols-2 md:grid-cols-6 lg:w-fit mx-auto bg-white backdrop-blur-sm border border-slate-200 shadow-lg rounded-2xl p-2">
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-7 lg:w-fit mx-auto bg-white backdrop-blur-sm border border-slate-200 shadow-lg rounded-2xl p-2">
             <TabsTrigger 
               value="dashboard" 
               className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-600 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=inactive]:text-slate-700 data-[state=inactive]:hover:text-slate-900 data-[state=inactive]:hover:bg-slate-100 rounded-xl transition-all duration-300 font-medium flex items-center gap-2"
@@ -271,6 +327,13 @@ const Index = () => {
             >
               Savings
             </TabsTrigger>
+            <TabsTrigger 
+              value="scheduled" 
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-600 data-[state=active]:to-emerald-600 data-[state=active]:text-white data-[state=inactive]:text-slate-700 data-[state=inactive]:hover:text-slate-900 data-[state=inactive]:hover:bg-slate-100 rounded-xl transition-all duration-300 font-medium flex items-center gap-2"
+            >
+              <Calendar className="h-4 w-4" />
+              Scheduled
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="dashboard" className="space-y-8">
@@ -304,6 +367,13 @@ const Index = () => {
               goals={savingsGoals} 
               onUpdateGoals={setSavingsGoals}
               transactions={transactions}
+            />
+          </TabsContent>
+
+          <TabsContent value="scheduled" className="space-y-8">
+            <ScheduledIncome 
+              scheduledIncomes={scheduledIncomes}
+              onUpdateScheduledIncomes={setScheduledIncomes}
             />
           </TabsContent>
         </Tabs>
